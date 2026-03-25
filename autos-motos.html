@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Operación de Vehículos | Cultura Vial Chimalpa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #008784;
+            --accent-prev: #f1c40f;
+            --accent-rest: #e74c3c;
+            --accent-info: #3498db;
+            --dark: #1a1a1a;
+        }
+
+        body { background-color: #f0f2f5; color: #2d3436; font-family: 'Inter', sans-serif; margin: 0; scroll-behavior: smooth; }
+
+        header {
+            background-color: #ffffff; display: flex; align-items: center; padding: 5px 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1); border-bottom: 4px solid var(--primary);
+            box-sizing: border-box; height: 80px; transition: top 0.4s;
+        }
+        .header-hidden { top: -100px; }
+        #main-logo { height: 60px; width: auto; }
+        .menu-btn { font-size: 24px; color: var(--primary); cursor: pointer; margin-right: 20px; }
+
+        .detail-page { padding: 110px 5% 60px; max-width: 1300px; margin: 0 auto; }
+
+        .back-btn-container { display: flex; justify-content: center; width: 100%; margin-bottom: 30px; }
+        .back-btn { color: var(--primary); text-decoration: none; font-weight: 800; transition: 0.3s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .back-btn:hover { transform: scale(1.05); opacity: 0.8; }
+
+        .hero-section { text-align: center; margin-bottom: 40px; }
+        .hero-section h1 { font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--dark); text-transform: uppercase; letter-spacing: -1px; }
+        .hero-section p { color: #636e72; font-size: 1.1rem; margin-top: 10px; font-weight: 500; }
+
+        .submenu-motorizados { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 60px; }
+        .btn-cat { padding: 15px; border-radius: 12px; text-decoration: none; font-family: 'Share Tech Mono', monospace; font-weight: 700; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); background: #fff; }
+        .btn-prev { color: var(--accent-prev); border-bottom: 4px solid var(--accent-prev); }
+        .btn-regl { color: var(--accent-rest); border-bottom: 4px solid var(--accent-rest); }
+        .btn-info { color: var(--accent-info); border-bottom: 4px solid var(--accent-info); }
+        .btn-cat:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); filter: brightness(0.95); }
+        .btn-cat i { font-size: 1.4rem; }
+
+        .section-box { margin-bottom: 80px; }
+        .category-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px solid #dfe6e9; }
+        .category-header h2 { font-family: 'Share Tech Mono', monospace; margin: 0; font-size: 1.6rem; text-transform: uppercase; }
+
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .signals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .signal-card { background: #fff; padding: 25px; border-radius: 16px; text-align: center; transition: 0.3s; border: 1px solid #f0f0f0; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .signal-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .img-wrapper { width: 110px; height: 110px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
+        .img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .signal-card h3 { font-size: 1.05rem; margin: 10px 0; font-weight: 800; color: var(--dark); text-transform: uppercase; }
+        .signal-card p { font-size: 0.85rem; color: #636e72; line-height: 1.5; margin: 0; }
+
+        /* --- SIDEBAR CON SLIDER DE INFOGRAFÍAS --- */
+        .info-sidebar {
+            background: var(--dark); border-radius: 20px; padding: 25px;
+            color: #fff; height: fit-content; position: sticky; top: 110px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .info-sidebar h4 { font-family: 'Share Tech Mono', monospace; color: var(--primary); margin: 0 0 10px; font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+        .info-sidebar p { font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px; line-height: 1.6; }
+        
+        .infografia-slider { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 15px; 
+            scroll-snap-type: x mandatory; 
+            padding-bottom: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+        /* Personalización de scrollbar para Chrome/Safari */
+        .infografia-slider::-webkit-scrollbar { height: 6px; }
+        .infografia-slider::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .square-thumb { 
+            flex: 0 0 100%; /* Cada foto ocupa todo el ancho del contenedor */
+            scroll-snap-align: center;
+            aspect-ratio: 1/1; 
+            overflow: hidden; 
+            border-radius: 12px; 
+            cursor: zoom-in; 
+            border: 2px solid rgba(255,255,255,0.1); 
+        }
+        .square-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+
+        .zoom-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center; }
+        .zoom-content { max-width: 90%; max-height: 90vh; border-radius: 5px; }
+
+        footer { text-align: center; padding: 40px; background-color: #1a1a1a; color: #888; font-size: 0.9rem; }
+
+        @media (max-width: 1000px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .info-sidebar { position: static; order: -1; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="zoomModal" class="zoom-overlay" onclick="closeZoom()">
+        <img class="zoom-content" id="imgZoomed">
+    </div>
+
+    <header id="main-header">
+        <div class="menu-btn" onclick="openNav()"><i class="fas fa-bars"></i></div>
+        <a href="index.html"><img src="assets/logo.png" alt="Logo" id="main-logo"></a>
+    </header>
+
+    <div id="mySideNav" class="side-menu" style="height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: #fff; overflow-x: hidden; transition: 0.5s; padding-top: 60px; box-shadow: 5px 0 15px rgba(0,0,0,0.1);">
+        <a href="javascript:void(0)" onclick="closeNav()" style="position: absolute; top: 10px; right: 25px; font-size: 36px; color: #ccc; text-decoration: none;">&times;</a>
+        <a href="index.html" style="padding: 15px 32px; text-decoration: none; font-size: 1.2rem; color: #333; display: block; font-weight: 600;">Panel Central</a>
+        <a href="infografias.html" style="padding: 15px 32px; text-decoration: none; font-size: 1.2rem; color: #333; display: block; font-weight: 600;">Módulos de Seguridad</a>
+    </div>
+
+    <div class="detail-page">
+        <div class="back-btn-container">
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+        </div>
+
+        <div class="hero-section">
+            <h1>Seguridad para Autos y Motos</h1>
+            <p>Responsabilidad al volante y protección en el camino</p>
+        </div>
+
+        <div class="submenu-motorizados">
+            <a href="#preventivas" class="btn-cat btn-prev"><i class="fas fa-exclamation-triangle"></i> PREVENTIVAS</a>
+            <a href="#restrictivas" class="btn-cat btn-regl"><i class="fas fa-ban"></i> REGLAMENTARIAS</a>
+            <a href="#informativas" class="btn-cat btn-info"><i class="fas fa-info-circle"></i> INFORMATIVAS</a>
+        </div>
+
+        <section id="preventivas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-prev);">SEÑALES PREVENTIVAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sp-curva-cerrada.png"></div>
+                        <h3>Curva Cerrada</h3>
+                        <p>Aviso de radio de giro reducido. Disminución de velocidad crítica requerida.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sp-tope.png"></div>
+                        <h3>Reductor de Velocidad</h3>
+                        <p>Elemento físico para el control de inercia vehicular en zonas residenciales.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sp-semaforo.png"></div>
+                        <h3>Control Semafórico</h3>
+                        <p>Advertencia de intersección regulada por sistema electrónico adelante.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sp-piso-resbaloso.png"></div>
+                        <h3>Baja Adherencia</h3>
+                        <p>Zona de riesgo por pérdida de fricción en la superficie de rodamiento.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar">
+                    <h4>MÓDULO DE SEGURIDAD</h4>
+                    <p>Desliza para ver infografías técnicas sobre prevención vial.</p>
+                    <div class="infografia-slider">
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_1.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_1.jpg">
+                        </div>
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_4.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_4.jpg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="restrictivas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-rest);">SEÑALES REGLAMENTARIAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-alto.png"></div>
+                        <h3>Alto Total</h3>
+                        <p>Protocolo de detención absoluta para la validación de cruce seguro en intersecciones.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-ceda-el-paso.png"></div>
+                        <h3>Prioridad de Paso</h3>
+                        <p>Obligación de ceder el flujo a vehículos en la vía principal o de mayor jerarquía.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-no-estacionarse.png"></div>
+                        <h3>Restricción de Aparcado</h3>
+                        <p>Prohibición de obstrucción en vía para mantener la capacidad de flujo del diseño vial.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-no-u.png"></div>
+                        <h3>Maniobra Prohibida (Vuelta en U)</h3>
+                        <p>Restricción de giro de 180° por alto riesgo de colisión frontal o lateral.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar" style="background: linear-gradient(135deg, #2c3e50, #000);">
+                    <h4>CUMPLIMIENTO REGLAMENTARIO</h4>
+                    <p>Desliza para consultar el reglamento operativo de tránsito.</p>
+                    <div class="infografia-slider">
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_2.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_2.jpg">
+                        </div>
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_5.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_5.jpg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="informativas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-info);">SEÑALES INFORMATIVAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/si-estacionamiento.png"></div>
+                        <h3>Zona de Resguardo</h3>
+                        <p>Espacio designado y autorizado para el estacionamiento técnico de vehículos.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/si-transicion.png"></div>
+                        <h3>Transición de Carriles</h3>
+                        <p>Información sobre cambios en la configuración geométrica de la vía.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar" style="background: linear-gradient(135deg, #1e3799, #0c2461);">
+                    <h4>DATOS DE NAVEGACIÓN</h4>
+                    <p>Desliza para ver mapas y puntos de interés del sistema vial.</p>
+                    <div class="infografia-slider">
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_3.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_3.jpg">
+                        </div>
+                        <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_MOTORIZADOS_6.jpg')">
+                            <img src="assets/NUEVA_INFO_MOTORIZADOS_6.jpg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Chimalpa | Cultura Vial Chimalpa</p>
+        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.6;">San Francisco Chimalpa, Edo. Mex.</p>
+    </footer>
+
+    <script>
+        function openNav() { document.getElementById("mySideNav").style.width = "280px"; }
+        function closeNav() { document.getElementById("mySideNav").style.width = "0"; }
+        function openZoom(src) { document.getElementById('imgZoomed').src = src; document.getElementById('zoomModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeZoom() { document.getElementById('zoomModal').style.display = 'none'; document.body.style.overflow = 'auto'; }
+        
+        let lastScrollTop = 0;
+        window.addEventListener("scroll", function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const header = document.getElementById("main-header");
+            if (scrollTop > lastScrollTop && scrollTop > 100) { header.classList.add("header-hidden"); }
+            else { header.classList.remove("header-hidden"); }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
+    </script>
+</body>
+</html>

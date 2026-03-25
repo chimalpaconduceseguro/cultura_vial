@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Memorama EXPERTO | Cultura Vial Chimalpa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(180deg, #e74c3c 0%, #1a1a1a 70%, #000 100%);
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            text-align: center; 
+            overflow-x: hidden; 
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: #ffffff; display: flex; align-items: center; padding: 5px 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05); border-bottom: 3px solid #e74c3c;
+            box-sizing: border-box;
+        }
+        #main-logo { height: 70px; width: auto; }
+
+        .game-controls-top {
+            width: 100%; display: flex; justify-content: flex-start;
+            padding: 0 5%; box-sizing: border-box; margin-top: 95px; margin-bottom: -10px; z-index: 900;
+        }
+
+        .btn-exit {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white;
+            padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 800;
+            font-size: 0.8rem; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .game-container { padding: 20px 2% 50px; max-width: 1200px; margin: 0 auto; }
+        
+        .stats-panel {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; margin-bottom: 30px; background: rgba(255,255,255,0.95);
+            padding: 20px; border-radius: 15px; box-shadow: 0 4px 25px rgba(231,76,60,0.2);
+            backdrop-filter: blur(5px);
+        }
+        .stat-box h4 { margin: 0; font-size: 0.9rem; color: #666; text-transform: uppercase; font-weight: 700; }
+        .stat-box p { margin: 5px 0 0; font-size: 1.8rem; font-weight: 800; color: #333; transition: 0.3s; }
+        
+        .time-gain { color: #28a745 !important; transform: scale(1.3); }
+        .time-loss { color: #dc3545 !important; transform: scale(1.3); }
+        .highlight { color: #e74c3c; }
+
+        .memory-game {
+            display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; perspective: 1000px;
+            margin-bottom: 40px;
+        }
+
+        .card { height: 140px; position: relative; transform-style: preserve-3d; transition: transform 0.5s; cursor: pointer; }
+        .card.flip { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            width: 100%; height: 100%; position: absolute; border-radius: 10px;
+            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            border: 1px solid #333;
+        }
+
+        .card-front { background: #fff; transform: rotateY(180deg); padding: 10px; box-sizing: border-box; }
+        .card-front img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .card-back { background: #333; color: #e74c3c; font-size: 2.5rem; }
+
+        .btn-reset {
+            margin-top: 30px; padding: 15px 40px; background: #fff; color: #333; border: none;
+            border-radius: 50px; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
+
+        .explode-card {
+            animation: explode 1.2s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+            pointer-events: none;
+            position: absolute !important;
+            z-index: 2000;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1) translate(0, 0) rotateY(0); opacity: 1; }
+            100% { 
+                transform: scale(0.1) translate(var(--x), var(--y)) rotate(var(--r)); 
+                opacity: 0; 
+            }
+        }
+
+        @media (max-width: 900px) { .memory-game { grid-template-columns: repeat(4, 1fr); } .card { height: 120px; } }
+        @media (max-width: 500px) { .memory-game { grid-template-columns: repeat(3, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html"><img src="assets/logo.png" alt="Logo" id="main-logo"></a>
+    </header>
+
+    <div class="game-controls-top">
+        <a href="juegos.html" class="btn-exit"><i class="fas fa-times-circle"></i> SALIR</a>
+    </div>
+
+    <div class="game-container">
+        <h1 style="font-weight: 800; color: #fff; margin-top: 0; font-size: 2.5rem;">NIVEL EXPERTO VIAL</h1>
+        
+        <p id="game-msg" style="color: #ccc; margin-bottom: 30px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">
+            <i class="fas fa-shield-alt"></i> DEMUESTRA TUS REFLEJOS: ¡CADA SEGUNDO CUENTA! <i class="fas fa-traffic-light"></i>
+        </p>
+
+        <div class="stats-panel">
+            <div class="stat-box"><h4>Tiempo</h4><p id="timer" class="highlight">90s</p></div>
+            <div class="stat-box"><h4>Pares</h4><p id="matches">0/16</p></div>
+            <div class="stat-box"><h4>Intentos</h4><p id="moves">0</p></div>
+        </div>
+
+        <div class="memory-game" id="board"></div>
+        <button class="btn-reset" onclick="initGame()">REINICIAR DESAFÍO</button>
+    </div>
+
+    <script>
+        const signals = [
+            { img: "assets/sp-peaton.png" }, { img: "assets/sp-escolar.png" },
+            { img: "assets/sr-no-peaton.png" }, { img: "assets/sr-velocidad.png" },
+            { img: "assets/sp-cruce-ciclistas.png" }, { img: "assets/sr-solo-bicis.png" },
+            { img: "assets/pav-caja-bici.png" }, { img: "assets/sp-bus.png" },
+            { img: "assets/sr-solo-bus.png" }, { img: "assets/si-parada.png" },
+            { img: "assets/sp-altura.png" }, { img: "assets/sr-peso-maximo.png" },
+            { img: "assets/sp-curva-cerrada.png" }, { img: "assets/sr-alto.png" },
+            { img: "assets/sr-no-estacionarse.png" }, { img: "assets/sp-semaforo.png" }
+        ];
+
+        let cards = [...signals, ...signals];
+        let firstCard, secondCard;
+        let lockBoard = false;
+        let moves = 0;
+        let matches = 0;
+        let timeLeft = 90;
+        let timer;
+        let gameActive = false;
+
+        function initGame() {
+            clearInterval(timer);
+            timeLeft = 90;
+            moves = 0;
+            matches = 0;
+            lockBoard = false;
+            gameActive = false;
+            updateStats();
+            document.getElementById('game-msg').innerText = "DEMUESTRA TUS REFLEJOS: ¡CADA SEGUNDO CUENTA!";
+            document.getElementById('game-msg').style.color = "#ccc";
+            
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            cards.sort(() => 0.5 - Math.random());
+
+            cards.forEach(signal => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <div class="card-front"><img src="${signal.img}"></div>
+                    <div class="card-back"><i class="fas fa-skull"></i></div>
+                `;
+                card.onclick = flipCard;
+                board.appendChild(card);
+            });
+        }
+
+        function startTimer() {
+            if (gameActive) return;
+            gameActive = true;
+            timer = setInterval(() => {
+                timeLeft--;
+                updateStats();
+                if (timeLeft <= 0) { handleGameOver(); }
+            }, 1000);
+        }
+
+        function handleGameOver() {
+            clearInterval(timer);
+            lockBoard = true;
+            const msg = document.getElementById('game-msg');
+            msg.innerText = "¡COLISIÓN TOTAL! GAME OVER.";
+            msg.style.color = "red";
+            document.getElementById('timer').innerText = "0s";
+
+            const cardsNodes = document.querySelectorAll('.card');
+            cardsNodes.forEach(card => card.classList.remove('flip'));
+
+            setTimeout(() => {
+                cardsNodes.forEach((card, index) => {
+                    const randomX = (Math.random() - 0.5) * 2000;
+                    const randomY = (Math.random() - 0.5) * 2000;
+                    const randomR = (Math.random() - 0.5) * 1440;
+                    card.style.setProperty('--x', `${randomX}px`);
+                    card.style.setProperty('--y', `${randomY}px`);
+                    card.style.setProperty('--r', `${randomR}deg`);
+                    setTimeout(() => { card.classList.add('explode-card'); }, index * 10);
+                });
+                setTimeout(() => { initGame(); }, 1800);
+            }, 500);
+        }
+
+        function flipCard() {
+            if (lockBoard || this === firstCard) return;
+            startTimer();
+            this.classList.add('flip');
+            if (!firstCard) { firstCard = this; return; }
+            secondCard = this;
+            moves++;
+            checkMatch();
+        }
+
+        function checkMatch() {
+            const isMatch = firstCard.innerHTML === secondCard.innerHTML;
+            const timerEl = document.getElementById('timer');
+
+            if (isMatch) {
+                matches++;
+                timeLeft += 10;
+                timerEl.classList.add('time-gain');
+                setTimeout(() => timerEl.classList.remove('time-gain'), 500);
+                resetCards(true);
+                if (matches === 16) {
+                    clearInterval(timer);
+                    gameActive = false;
+                    setTimeout(() => alert("¡Increíble Héctor! Maestro de la vialidad."), 500);
+                }
+            } else {
+                timeLeft -= 5;
+                timerEl.classList.add('time-loss');
+                setTimeout(() => timerEl.classList.remove('time-loss'), 500);
+                if (timeLeft <= 0) { handleGameOver(); } 
+                else { resetCards(false); }
+            }
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('timer').innerText = (timeLeft < 0 ? 0 : timeLeft) + "s";
+            document.getElementById('moves').innerText = moves;
+            document.getElementById('matches').innerText = `${matches}/16`;
+        }
+
+        function resetCards(isMatch) {
+            lockBoard = true;
+            setTimeout(() => {
+                if (!isMatch) {
+                    if(firstCard) firstCard.classList.remove('flip');
+                    if(secondCard) secondCard.classList.remove('flip');
+                }
+                firstCard = null;
+                secondCard = null;
+                lockBoard = false;
+            }, 1000);
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es-mx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Simulador Vial Chimalpa | Motor</title>
+    <style>
+        /* Limpiamos todo el estilo por defecto de Unity */
+        body { padding: 0; margin: 0; background: #000; overflow: hidden; width: 100%; height: 100%; }
+        #unity-container { width: 100vw; height: 100vh; position: absolute; }
+        canvas { width: 100% !important; height: 100% !important; display: block; }
+
+        /* Estilo personalizado de la barra de carga */
+        #unity-loading-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; text-align: center; width: 200px; }
+        #unity-progress-bar-empty { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        #unity-progress-bar-full { width: 0%; height: 100%; background: #008784; transition: 0.2s; }
+        #loading-text { color: white; font-family: sans-serif; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
+        
+        #unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="unity-container">
+        <canvas id="unity-canvas" tabindex="-1"></canvas>
+        
+        <div id="unity-loading-bar">
+            <div id="loading-text">Iniciando Motor...</div>
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var container = document.querySelector("#unity-container");
+        var canvas = document.querySelector("#unity-canvas");
+        var loadingBar = document.querySelector("#unity-loading-bar");
+        var progressBarFull = document.querySelector("#unity-progress-bar-full");
+        var warningBanner = document.querySelector("#unity-warning");
+
+        function unityShowBanner(msg, type) {
+            // Silenciamos los banners para que no estorben en el simulador
+            console.log(msg);
+        }
+
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/Juego_Final.loader.js";
+        var config = {
+            dataUrl: buildUrl + "/Juego_Final.data.unityweb",
+            frameworkUrl: buildUrl + "/Juego_Final.framework.js.unityweb",
+            codeUrl: buildUrl + "/Juego_Final.wasm.unityweb",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "Chimalpa Pro",
+            productName: "Simulador Vial",
+            productVersion: "1.0",
+            showBanner: unityShowBanner,
+        };
+
+        // Forzamos el pixel ratio para que se vea nítido
+        config.devicePixelRatio = window.devicePixelRatio || 1;
+
+        loadingBar.style.display = "block";
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                progressBarFull.style.width = 100 * progress + "%";
+            }).then((unityInstance) => {
+                loadingBar.style.display = "none";
+            }).catch((message) => {
+                alert("Error al cargar el simulador: " + message);
+            });
+        };
+        document.body.appendChild(script);
+
+        // FUNCIÓN DEL ASISTENTE DE VOZ (Llamada desde Unity)
+        function hablarAsistente(texto) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                var msg = new SpeechSynthesisUtterance(texto);
+                msg.lang = 'es-MX';
+                msg.rate = 1.0;
+                msg.pitch = 1.0;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+    </script>
+</body>
+</html>

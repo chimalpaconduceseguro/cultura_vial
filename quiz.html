@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificación Vial | COLISIÓN 3D</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #00f2ea; --wrong: #ff4b5c; --dark: #05070a; }
+
+        body {
+            background: #000; margin: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            perspective: 1200px; overflow: hidden; font-family: 'Inter', sans-serif;
+        }
+
+        /* --- BOTÓN DE SALIDA --- */
+        .exit-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 1001;
+            padding: 10px 20px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
+            color: #fff; text-decoration: none; font-family: 'Orbitron';
+            font-size: 0.7rem; letter-spacing: 1px; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .exit-btn:hover { background: var(--wrong); border-color: var(--wrong); transform: scale(1.05); }
+
+        /* --- CONTENEDOR DE VIDRIO ROTO --- */
+        #shatter-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000; display: none;
+            background: url('https://i.imgur.com/uS3k8m9.png');
+            background-size: cover; opacity: 0.8;
+        }
+
+        /* --- ANIMACIÓN DE CHOQUE --- */
+        @keyframes crashShake {
+            0% { transform: scale(1) translateZ(0); }
+            20% { transform: scale(1.2) rotate(3deg) translateZ(100px); filter: brightness(4) blur(2px); }
+            100% { transform: scale(1) rotate(0) translateZ(0); }
+        }
+        .screen-crash { animation: crashShake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .quiz-card {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 500px;
+            padding: 40px; border-radius: 40px; text-align: center;
+            transform-style: preserve-3d; transition: transform 0.1s;
+        }
+
+        .timer-node {
+            position: absolute; top: -30px; right: 40px; width: 70px; height: 70px;
+            background: var(--dark); border: 3px solid var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; color: var(--primary); font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(0,242,234,0.4); z-index: 20;
+        }
+
+        .img-box { 
+            width: 160px; height: 160px; background: #fff; margin: 0 auto 25px; 
+            border-radius: 25px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: translateZ(30px);
+        }
+        .img-box img { max-width: 80%; }
+
+        .options-grid { display: grid; gap: 12px; }
+        .btn-opt {
+            width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 15px;
+            cursor: pointer; font-weight: 700; transition: 0.2s; text-align: left;
+            display: flex; align-items: center; gap: 15px; font-size: 0.95rem;
+        }
+        .btn-opt span { color: var(--primary); font-family: 'Orbitron'; font-size: 0.8rem; }
+        .btn-opt:hover { background: rgba(0, 242, 234, 0.1); border-color: var(--primary); transform: translateX(5px); }
+
+        #defeat-screen { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 0, 0.9); z-index: 50; border-radius: 40px;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .defeat-text { font-family: 'Orbitron'; color: var(--wrong); font-size: 2rem; font-weight: 900; letter-spacing: 2px; }
+
+        #final-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <a href="juegos.html" class="exit-btn"><i class="fas fa-times-circle"></i> ABORTAR MISIÓN</a>
+
+    <div id="shatter-overlay"></div>
+
+    <div class="quiz-card" id="main-card">
+        <div id="defeat-screen">
+            <i class="fas fa-skull-crossbones" style="font-size: 4rem; color: var(--wrong); margin-bottom: 20px;"></i>
+            <div class="defeat-text">UNIDAD DESTRUIDA</div>
+            <p style="color: #fff; margin-top: 15px; font-weight: 700;">ERROR DE CRITERIO DETECTADO</p>
+            <p style="color: var(--primary); font-size: 0.8rem;">Reiniciando sistemas...</p>
+        </div>
+
+        <div class="timer-node" id="timer-val">5</div>
+        
+        <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--primary); margin-bottom:15px; letter-spacing:3px;">SIMULACIÓN DE IMPACTO v3.0</div>
+        
+        <div class="img-box"><img src="" id="q-img"></div>
+        <h2 id="q-text" style="color: #fff; font-size: 1.2rem; margin-bottom: 30px; min-height: 50px;"></h2>
+        
+        <div class="options-grid" id="options-box"></div>
+    </div>
+
+    <div class="quiz-card" id="final-screen">
+        <h1 style="font-family:'Orbitron'; color:var(--primary)">MISIÓN COMPLETADA</h1>
+        <div style="font-size: 4rem; font-weight: 900;" id="final-score">0/10</div>
+        <button onclick="location.reload()" style="padding:15px 40px; border-radius:50px; border:none; background:var(--primary); font-family:'Orbitron'; font-weight:900; cursor:pointer;">REINICIAR</button>
+    </div>
+
+    <script>
+        const banco = [
+            { img: "assets/sr-alto.png", q: "¿Cuál es la acción obligatoria ante esta señal?", opts: ["Disminuir velocidad", "Alto total 3 segundos", "Ceda el paso", "Girar a la derecha"], ans: 1 },
+            { img: "assets/sp-peaton.png", q: "¿Qué prioridad tiene el actor de esta señal?", opts: ["Baja", "Media", "Máxima (Nivel 1)", "Nula"], ans: 2 },
+            { img: "assets/sr-no-u.png", q: "Esta señal prohíbe estrictamente:", opts: ["Girar a la izquierda", "Seguir de frente", "Retorno en U", "Cambio de carril"], ans: 2 },
+            { img: "assets/si-ciclovia.png", q: "El color azul en esta señal indica que es:", opts: ["Restrictiva", "Preventiva", "Informativa", "Transitoria"], ans: 2 }
+            // Agrega tus otras señales aquí
+        ];
+
+        let exam = [], current = 0, score = 0, timeLeft = 5, timerInterval;
+
+        function start() {
+            exam = banco.sort(() => 0.5 - Math.random()).slice(0, 10);
+            render();
+        }
+
+        function render() {
+            const data = exam[current];
+            document.getElementById('q-img').src = data.img;
+            document.getElementById('q-text').innerText = data.q;
+            const box = document.getElementById('options-box');
+            box.innerHTML = "";
+            data.opts.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "btn-opt";
+                btn.innerHTML = `<span>${String.fromCharCode(65 + i)}</span> ${opt}`;
+                btn.onclick = () => check(i);
+                box.appendChild(btn);
+            });
+            resetTimer();
+        }
+
+        function resetTimer() {
+            timeLeft = 5;
+            document.getElementById('timer-val').innerText = timeLeft;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-val').innerText = timeLeft;
+                if(timeLeft <= 0) triggerDefeat();
+            }, 1000);
+        }
+
+        function check(i) {
+            clearInterval(timerInterval);
+            if(i === exam[current].ans) {
+                score++;
+                current++;
+                if(current < 10) render(); else finish();
+            } else {
+                triggerDefeat();
+            }
+        }
+
+        function triggerDefeat() {
+            clearInterval(timerInterval);
+            const card = document.getElementById('main-card');
+            const glass = document.getElementById('shatter-overlay');
+            const defeat = document.getElementById('defeat-screen');
+            card.classList.add('screen-crash');
+            glass.style.display = 'block';
+            defeat.style.display = 'flex';
+            setTimeout(() => { location.reload(); }, 4000);
+        }
+
+        function finish() {
+            document.getElementById('main-card').style.display = "none";
+            document.getElementById('final-screen').style.display = "block";
+            document.getElementById('final-score').innerText = `${score}/10`;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const card = document.getElementById('main-card');
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+
+        start();
+    </script>
+</body>
+</html>

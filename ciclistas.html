@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Movilidad Ciclista | Cultura Vial Chimalpa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #008784;
+            --accent-prev: #f1c40f;
+            --accent-rest: #e74c3c;
+            --accent-info: #3498db;
+            --accent-pav: #636e72;
+            --dark: #1a1a1a;
+        }
+
+        body { background-color: #f0f2f5; color: #2d3436; font-family: 'Inter', sans-serif; margin: 0; scroll-behavior: smooth; }
+
+        header {
+            background-color: #ffffff; display: flex; align-items: center; padding: 5px 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1); border-bottom: 4px solid var(--primary);
+            box-sizing: border-box; height: 80px;
+        }
+        #main-logo { height: 60px; width: auto; }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .detail-page { padding: 110px 5% 60px; max-width: 1300px; margin: 0 auto; }
+
+        .hero-section { text-align: center; margin-bottom: 40px; }
+        .hero-section h1 { font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--dark); text-transform: uppercase; }
+        .hero-section p { color: #636e72; font-size: 1.1rem; margin-top: 10px; }
+
+        /* --- SUBMENÚ ESTILO PEATONES (ESTANDARIZADO) --- */
+        .submenu-standard { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 60px; 
+        }
+        .btn-cat { 
+            padding: 15px; border-radius: 12px; text-decoration: none; 
+            font-family: 'Share Tech Mono', monospace; font-weight: 700; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            text-align: center; border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); background: #fff;
+        }
+        .btn-prev { color: var(--accent-prev); border-bottom: 4px solid var(--accent-prev); }
+        .btn-regl { color: var(--accent-rest); border-bottom: 4px solid var(--accent-rest); }
+        .btn-info { color: var(--accent-info); border-bottom: 4px solid var(--accent-info); }
+        .btn-pav  { color: var(--accent-pav); border-bottom: 4px solid var(--accent-pav); }
+
+        .btn-cat:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); filter: brightness(0.95); }
+        .btn-cat i { font-size: 1.4rem; }
+
+        /* --- LAYOUT SECCIONES --- */
+        .section-box { margin-bottom: 80px; }
+        .category-header { 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 30px; 
+            padding-bottom: 10px; border-bottom: 2px solid #dfe6e9;
+        }
+        .category-header h2 { font-family: 'Share Tech Mono', monospace; margin: 0; font-size: 1.6rem; text-transform: uppercase; }
+
+        .grid-layout { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr; 
+            gap: 30px; 
+        }
+
+        .signals-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 20px; 
+        }
+
+        .signal-card { 
+            background: #fff; padding: 25px; border-radius: 16px; 
+            text-align: center; transition: 0.3s; border: 1px solid #f0f0f0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        }
+        .signal-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+
+        .img-wrapper { width: 120px; height: 120px; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; }
+        .img-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .signal-card h3 { font-size: 1.1rem; margin: 10px 0; font-weight: 800; color: var(--dark); }
+        .signal-card p { font-size: 0.9rem; color: #636e72; line-height: 1.5; margin: 0; }
+
+        /* --- SIDEBAR INFO --- */
+        .info-sidebar {
+            background: var(--dark); border-radius: 20px; padding: 25px;
+            color: #fff; height: fit-content; position: sticky; top: 110px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .info-sidebar h4 { font-family: 'Share Tech Mono', monospace; color: var(--primary); margin: 0 0 10px; font-size: 0.8rem; text-transform: uppercase; }
+        .info-sidebar p { font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px; }
+        
+        .square-thumb { 
+            width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 12px; 
+            cursor: zoom-in; border: 2px solid rgba(255,255,255,0.1); 
+        }
+        .square-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+        .square-thumb:hover img { transform: scale(1.05); }
+
+        /* --- MODAL ZOOM --- */
+        .zoom-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center;
+        }
+        .zoom-content { max-width: 90%; max-height: 90vh; border-radius: 5px; }
+
+        @media (max-width: 1000px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .info-sidebar { position: static; order: -1; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="zoomModal" class="zoom-overlay" onclick="closeZoom()">
+        <img class="zoom-content" id="imgZoomed">
+    </div>
+
+    <header>
+        <a href="index.html"><img src="assets/logo.png" alt="Logo" id="main-logo"></a>
+    </header>
+
+    <div class="detail-page">
+        <div class="hero-section">
+            <a href="index.html" style="text-decoration:none; color:var(--primary); font-weight:800; font-size:0.8rem;"><i class="fas fa-arrow-left"></i> VOLVER AL INICIO</a>
+            <h1>Seguridad para Ciclistas</h1>
+            <p>Fomentando una movilidad sustentable y segura</p>
+        </div>
+
+        <div class="submenu-standard">
+            <a href="#preventivas" class="btn-cat btn-prev"><i class="fas fa-exclamation-triangle"></i> PREVENTIVAS</a>
+            <a href="#restrictivas" class="btn-cat btn-regl"><i class="fas fa-ban"></i> REGLAMENTARIAS</a>
+            <a href="#informativas" class="btn-cat btn-info"><i class="fas fa-info-circle"></i> INFORMATIVAS</a>
+            <a href="#pavimento" class="btn-cat btn-pav"><i class="fas fa-paint-roller"></i> PAVIMENTO</a>
+        </div>
+
+        <section id="preventivas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-prev);">SEÑALES PREVENTIVAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sp-cruce-ciclistas.png"></div>
+                        <h3>Cruce de Ciclistas</h3>
+                        <p>Alerta a conductores sobre la proximidad de zonas donde circulan bicicletas frecuentemente.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar">
+                    <h4>MÓDULO DE ADVERTENCIA</h4>
+                    <p>La prevención es la clave para evitar accidentes en intersecciones y zonas rurales.</p>
+                    <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_CICLISTA_1.jpg')">
+                        <img src="assets/NUEVA_INFO_CICLISTA_1.jpg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="restrictivas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-rest);">SEÑALES REGLAMENTARIAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-solo-bicis.png"></div>
+                        <h3>Exclusivo Bicicletas</h3>
+                        <p>Vía o carril donde únicamente se permite la circulación de vehículos no motorizados.</p>
+                    </div>
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/sr-no-bicis.png"></div>
+                        <h3>Prohibido Bicicletas</h3>
+                        <p>Vías rápidas o zonas de alto riesgo donde el tránsito de ciclistas no está permitido.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar" style="background: linear-gradient(135deg, #2c3e50, #000);">
+                    <h4>REGLAMENTO VIAL</h4>
+                    <p>El cumplimiento de estas normas garantiza el orden y la seguridad en vías compartidas.</p>
+                    <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_CICLISTA_2.jpg')">
+                        <img src="assets/NUEVA_INFO_CICLISTA_2.jpg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="informativas" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-info);">SEÑALES INFORMATIVAS</h2>
+            </div>
+            <div class="grid-layout">
+                <div class="signals-grid">
+                    <div class="signal-card">
+                        <div class="img-wrapper"><img src="assets/si-ciclovia.png"></div>
+                        <h3>Ciclovía</h3>
+                        <p>Indica el inicio de una ruta diseñada y señalizada especialmente para la movilidad ciclista.</p>
+                    </div>
+                </div>
+                <div class="info-sidebar" style="background: linear-gradient(135deg, #1e3799, #0c2461);">
+                    <h4>GUÍA CICLISTA</h4>
+                    <p>Conoce las rutas seguras y los espacios designados para tu trayecto.</p>
+                    <div class="square-thumb" onclick="openZoom('assets/NUEVA_INFO_CICLISTA_3.jpg')">
+                        <img src="assets/NUEVA_INFO_CICLISTA_3.jpg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pavimento" class="section-box">
+            <div class="category-header">
+                <h2 style="color:var(--accent-pav);">Marcas en el Pavimento</h2>
+            </div>
+            <div class="grid-gallery" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="signal-card">
+                    <div class="img-wrapper"><img src="assets/pav-caja-bici.png"></div>
+                    <h3>Caja Bici (Bici-Box)</h3>
+                    <p>Zona de espera que permite a los ciclistas posicionarse delante de los autos en los semáforos.</p>
+                </div>
+                <div class="signal-card">
+                    <div class="img-wrapper"><img src="assets/pav-compartido.png"></div>
+                    <h3>Prioridad Ciclista</h3>
+                    <p>Indica que el carril es compartido y el ciclista tiene derecho legal a ocupar todo el espacio.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer style="text-align:center; padding: 40px; background:#1a1a1a; color:#fff; font-size:0.9rem;">
+        <p>&copy; 2026 Chimalpa | Cultura Vial Chimalpa</p>
+        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.6;">San Francisco Chimalpa, Edo. Mex.</p>
+    </footer>
+
+    <script>
+        function openZoom(src) {
+            document.getElementById('imgZoomed').src = src;
+            document.getElementById('zoomModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeZoom() {
+            document.getElementById('zoomModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>

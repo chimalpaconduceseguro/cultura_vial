@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blueprint Puzzle Pro | Chimalpa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blueprint-bg: #1a2b3c;
+            --grid-line: rgba(0, 242, 234, 0.15);
+            --accent: #00f2ea;
+            --secondary: #008784;
+            --paper: #ffffff;
+            --wrong: #ff4b5c;
+            --correct-flash: #00ff88;
+        }
+
+        body { 
+            background-color: var(--blueprint-bg);
+            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            font-family: 'Inter', sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            min-height: 100vh; color: white; overflow-x: hidden;
+            touch-action: manipulation; perspective: 2000px;
+        }
+
+        header { 
+            background: white; padding: 10px 5%; position: fixed; width: 100%; top: 0; 
+            z-index: 1000; border-bottom: 4px solid var(--secondary); box-sizing: border-box; 
+            display: flex; align-items: center;
+        }
+        #main-logo { height: 50px; width: auto; }
+
+        .game-controls-top {
+            width: 100%; display: flex; justify-content: space-between; padding: 0 5%; 
+            margin-top: 95px; z-index: 900; box-sizing: border-box; align-items: center;
+        }
+
+        .btn-exit {
+            background: rgba(255,255,255,0.05); color: white; padding: 10px 18px;
+            border-radius: 4px; text-decoration: none; font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; border: 1px solid var(--accent);
+            backdrop-filter: blur(10px); transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-exit:hover { background: var(--wrong); border-color: var(--wrong); }
+
+        .timer-display {
+            font-family: 'Share Tech Mono', monospace;
+            background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 5px;
+            border: 1px solid var(--accent); color: var(--accent);
+        }
+
+        .difficulty-selector { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
+        .diff-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--grid-line);
+            color: white; padding: 8px 15px; cursor: pointer; font-family: 'Share Tech Mono';
+            font-size: 0.75rem; transition: 0.3s; border-radius: 4px;
+        }
+        .diff-btn:hover, .diff-btn.active { background: var(--accent); color: var(--blueprint-bg); border-color: var(--accent); }
+
+        /* --- ORDENACIÓN DE ELEMENTOS --- */
+        .game-area {
+            display: flex;
+            flex-direction: column; /* Mesa arriba, piezas abajo */
+            align-items: center;
+            width: 100%;
+        }
+
+        #puzzle-board { 
+            display: grid; background-color: rgba(0,0,0,0.3); border: 2px solid var(--accent); 
+            width: 320px; height: 320px; margin: 0 auto; border-radius: 4px; gap: 1px;
+            transform: rotateX(10deg) rotateY(-5deg) translateZ(50px);
+            box-shadow: 50px 50px 100px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease-out; transform-style: preserve-3d;
+            order: 1; /* Forzamos arriba */
+        }
+
+        .pieces-menu-wrapper { 
+            width: 90%; max-width: 500px; background: rgba(0,0,0,0.4); 
+            padding: 20px; border-radius: 8px; border: 1px solid var(--grid-line); 
+            margin-top: 40px; 
+            order: 2; /* Forzamos abajo */
+        }
+
+        #pieces-container { display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px; min-height: 100px; align-items: center; }
+
+        @keyframes systemFailure {
+            0% { transform: scale(1); filter: brightness(1); }
+            10% { transform: scale(1.05) rotate(2deg); filter: brightness(3) sepia(1) hue-rotate(-50deg); }
+            100% { transform: scale(1) rotate(0); filter: brightness(1); }
+        }
+        .fail-active { animation: systemFailure 0.4s infinite; }
+
+        #shatter-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2000; display: none;
+            background: url('https://i.imgur.com/uS3k8m9.png');
+            background-size: cover; opacity: 0.9;
+        }
+
+        .drop-zone { background-color: rgba(255,255,255,0.02); border: 1px solid rgba(0, 242, 234, 0.05); width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+
+        @keyframes pieceSnap {
+            0% { transform: scale(1.3) translateZ(60px); filter: brightness(2) drop-shadow(0 0 20px var(--correct-flash)); }
+            100% { transform: scale(1) translateZ(0); filter: brightness(1); }
+        }
+        .piece-snapped { animation: pieceSnap 0.4s forwards; }
+
+        .piece { cursor: grab; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; box-shadow: 0 8px 15px rgba(0,0,0,0.4); flex-shrink: 0; touch-action: none; transition: transform 0.2s; }
+        .fixed { cursor: default !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+
+        .flip-card { display: none; width: 320px; height: 320px; perspective: 1000px; margin: 20px auto; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .flipped { transform: rotateY(180deg); }
+        .flip-front, .flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; box-sizing: border-box; }
+        .flip-front { background: white; border: 4px solid var(--accent); }
+        .flip-front img { width: 100%; height: 100%; object-fit: contain; }
+        .flip-back { background: var(--paper); color: #2c3e50; transform: rotateY(180deg); text-align: left; }
+        .btn-next { width: 100%; padding: 12px; background-color: var(--secondary); color: white; border: none; border-radius: 4px; font-weight: 800; font-family: 'Share Tech Mono'; cursor: pointer; margin-top: 15px; }
+
+        @media (max-width: 768px) { #puzzle-board { width: 280px; height: 280px; transform: none !important; } }
+    </style>
+</head>
+<body>
+
+    <div id="shatter-overlay"></div>
+
+    <header><a href="index.html"><img src="assets/logo.png" alt="Logo Chimalpa" id="main-logo"></a></header>
+
+    <div class="game-controls-top">
+        <a href="juegos.html" class="btn-exit"><i class="fas fa-undo"></i> SALIR</a>
+        <div class="timer-display">
+            <i class="fas fa-bolt"></i> ENERGÍA: <span id="timer-val">30</span>s
+        </div>
+    </div>
+
+    <div class="game-container" style="text-align:center;">
+        <h1 style="font-size: 1.5rem; padding: 0 10px;">Ensamblaje de señalamientos Viales</h1>
+
+        <div class="difficulty-selector">
+            <button class="diff-btn active" id="btn-3" onclick="setDifficulty(3)">3x3 (FÁCIL)</button>
+            <button class="diff-btn" id="btn-5" onclick="setDifficulty(5)">5x5 (MEDIO)</button>
+            <button class="diff-btn" id="btn-7" onclick="setDifficulty(7)">7x7 (DIFÍCIL)</button>
+        </div>
+
+        <div class="game-area" id="main-game-area">
+            <div id="puzzle-board"></div>
+            
+            <div class="pieces-menu-wrapper">
+                <div style="font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--accent); margin-bottom: 12px; text-align: left;">
+                    > ANALIZANDO: <span id="level-title-display"></span>
+                </div>
+                <div id="pieces-container"></div>
+            </div>
+            <button style="background:none; border:none; color:rgba(255,255,255,0.2); text-decoration:underline; font-size: 0.6rem; cursor:pointer; font-family: 'Share Tech Mono'; margin-top: 10px;" onclick="resetProgress()">BORRAR_MEMORIA_CACHE</button>
+        </div>
+
+        <div class="flip-card" id="reveal-card">
+            <div class="flip-card-inner" id="inner-card">
+                <div class="flip-front"><img id="full-img-view" src=""></div>
+                <div class="flip-back">
+                    <h2 id="info-title" style="font-family:'Share Tech Mono'; color:var(--secondary);"></h2>
+                    <p id="info-desc"></p>
+                    <button class="btn-next" onclick="nextLevel()">CARGAR_SIGUIENTE_FASE >></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            { name: "Paso Peatonal", img: "assets/sp-peaton.png", desc: "Prioridad máxima de cruce para peatones." },
+            { name: "Zona Escolar", img: "assets/sp-escolar.png", desc: "Reducción obligatoria a 20km/h." },
+            { name: "Hospital", img: "assets/sp-hospital.png", desc: "Zona de precaución y reducción de ruido." },
+            { name: "Prohibido Peatones", img: "assets/sr-no-peaton.png", desc: "Restricción por seguridad en vías rápidas." },
+            { name: "Velocidad Máxima", img: "assets/sr-velocidad.png", desc: "Límite técnico de seguridad vial." },
+            { name: "Puente Peatonal", img: "assets/si-puente.png", desc: "Indica cruce seguro a desnivel." },
+            { name: "Zona Peatonal", img: "assets/si-zona-peatonal.png", desc: "Área de circulación exclusiva para personas." },
+            { name: "Cruce Ciclistas", img: "assets/sp-cruce-ciclistas.png", desc: "Alerta por flujo constante de bicicletas." },
+            { name: "Solo Bicicletas", img: "assets/sr-solo-bicis.png", desc: "Carril confinado para uso ciclista." },
+            { name: "Prohibido Bicis", img: "assets/sr-no-bicis.png", desc: "Restricción de acceso a ciclistas." },
+            { name: "Ciclovía", img: "assets/si-ciclovia.png", desc: "Ruta diseñada específicamente para ciclistas." },
+            { name: "Caja Bici", img: "assets/pav-caja-bici.png", desc: "Zona de espera prioritaria en semáforos." },
+            { name: "Carril Compartido", img: "assets/pav-compartido.png", desc: "Prioridad al ciclista sobre el carril completo." },
+            { name: "Salida Bus", img: "assets/sp-bus.png", desc: "Incorporación de transporte masivo a la vía." },
+            { name: "Cruce Eléctrico", img: "assets/sp-tranvia.png", desc: "Paso de tren ligero o trolebús." },
+            { name: "Solo Bus", img: "assets/sr-solo-bus.png", desc: "Carril de uso exclusivo para transporte colectivo." },
+            { name: "No Parar", img: "assets/sr-prohibido-parar.png", desc: "Vía de flujo continuo; prohibido ascenso/descenso." },
+            { name: "No Autobuses", img: "assets/sr-prohibido-bus.png", desc: "Restricción para vehículos de transporte pesado." },
+            { name: "Parada Bus", img: "assets/si-parada.png", desc: "Punto oficial de ascenso y descenso de pasajeros." },
+            { name: "Sitio Taxi", img: "assets/si-taxi.png", desc: "Zona reservada para transporte individual." },
+            { name: "Terminal", img: "assets/si-terminal.png", desc: "Estación de transferencia o fin de ruta." },
+            { name: "Carril Bus Pav.", img: "assets/pav-solo-bus.png", desc: "Señalamiento horizontal de carril preferente." },
+            { name: "Altura Libre", img: "assets/sp-altura.png", desc: "Límite vertical para el paso de unidades." },
+            { name: "Ancho Libre", img: "assets/sp-anchura.png", desc: "Límite horizontal en pasos estrechos." },
+            { name: "Peso Máximo", img: "assets/sr-peso-maximo.png", desc: "Límite de tonelaje permitido." },
+            { name: "No Carga", img: "assets/sr-no-carga.png", desc: "Prohibido el tránsito de carga pesada." },
+            { name: "Longitud Máxima", img: "assets/sr-longitud.png", desc: "Restricción por radio de giro." },
+            { name: "Zona de Carga", img: "assets/si-zona-carga.png", desc: "Área logística para maniobras." },
+            { name: "Curva Cerrada", img: "assets/sp-curva-cerrada.png", desc: "Reducción de velocidad por diseño." },
+            { name: "Reductor/Tope", img: "assets/sp-tope.png", desc: "Obstáculo físico para control de velocidad." },
+            { name: "Semáforo Próx.", img: "assets/sp-semaforo.png", desc: "Advertencia de control electrónico." },
+            { name: "Piso Resbaloso", img: "assets/sp-piso-resbaloso.png", desc: "Baja adherencia en la superficie." },
+            { name: "Alto", img: "assets/sr-alto.png", desc: "Detención total del vehículo obligatoria." },
+            { name: "Ceda el Paso", img: "assets/sr-ceda-el-paso.png", desc: "Dar prioridad a la vía principal." },
+            { name: "No Estacionar", img: "assets/sr-no-estacionarse.png", desc: "Mantener la vía libre de obstáculos." },
+            { name: "No Vuelta en U", img: "assets/sr-no-u.png", desc: "Maniobra prohibida por seguridad." },
+            { name: "Estacionamiento", img: "assets/si-estacionamiento.png", desc: "Espacio autorizado para resguardo." },
+            { name: "Transición Carril", img: "assets/si-transicion.png", desc: "Informa sobre cambios en la vía." }
+        ];
+
+        let currentLevel = 0, gridSize = 3, timeLeft = 30, timerInterval;
+        const boardSize = 320;
+
+        function setDifficulty(size) {
+            gridSize = size;
+            if(size === 3) timeLeft = 30;
+            else if(size === 5) timeLeft = 60;
+            else if(size === 7) timeLeft = 90;
+
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${size}`).classList.add('active');
+            initGame();
+        }
+
+        function startTimer() {
+            if(gridSize === 3) timeLeft = 30;
+            else if(gridSize === 5) timeLeft = 60;
+            else if(gridSize === 7) timeLeft = 90;
+
+            document.getElementById('timer-val').innerText = timeLeft;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-val').innerText = timeLeft;
+                if(timeLeft <= 10) document.getElementById('timer-val').style.color = 'var(--wrong)';
+                else document.getElementById('timer-val').style.color = 'var(--accent)';
+                
+                if(timeLeft <= 0) triggerFailure();
+            }, 1000);
+        }
+
+        function triggerFailure() {
+            clearInterval(timerInterval);
+            document.body.classList.add('fail-active');
+            document.getElementById('shatter-overlay').style.display = 'block';
+            setTimeout(() => {
+                document.body.classList.remove('fail-active');
+                document.getElementById('shatter-overlay').style.display = 'none';
+                initGame();
+            }, 3000);
+        }
+
+        function initGame() {
+            const saved = localStorage.getItem('chimalpa_puzzle_lvl');
+            currentLevel = saved ? parseInt(saved) : 0;
+            document.getElementById('level-title-display').innerText = levels[currentLevel].name;
+            document.getElementById('main-game-area').style.display = "flex";
+            document.getElementById('reveal-card').style.display = "none";
+            document.getElementById('inner-card').classList.remove('flipped');
+            renderBoard();
+            renderPieces();
+            startTimer();
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('puzzle-board');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const zone = document.createElement('div');
+                zone.classList.add('drop-zone');
+                zone.dataset.index = i;
+                zone.ondragover = e => e.preventDefault();
+                zone.ondrop = handleDrop;
+                board.appendChild(zone);
+            }
+        }
+
+        function renderPieces() {
+            const container = document.getElementById('pieces-container');
+            container.innerHTML = '';
+            const pSize = boardSize / gridSize;
+            const pieces = [];
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const p = document.createElement('div');
+                p.classList.add('piece');
+                p.id = `p-${i}`;
+                p.draggable = true;
+                p.style.width = p.style.height = `${pSize}px`;
+                p.style.backgroundImage = `url('${levels[currentLevel].img}')`;
+                p.style.backgroundSize = `${boardSize}px ${boardSize}px`;
+                p.style.backgroundPosition = `-${(i % gridSize) * pSize}px -${Math.floor(i / gridSize) * pSize}px`;
+                p.ondragstart = e => e.dataTransfer.setData('text', e.target.id);
+                p.ontouchstart = handleTouchStart;
+                p.ontouchmove = handleTouchMove;
+                p.ontouchend = handleTouchEnd;
+                pieces.push(p);
+            }
+            pieces.sort(() => Math.random() - 0.5).forEach(p => container.appendChild(p));
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const p = document.getElementById(id);
+            if (id.split('-')[1] === e.currentTarget.dataset.index) {
+                p.classList.add('fixed', 'piece-snapped');
+                e.currentTarget.appendChild(p);
+                p.style.width = p.style.height = "100%";
+                checkWin();
+            }
+        }
+
+        let touchPiece = null;
+        function handleTouchStart(e) { if (!this.classList.contains('fixed')) { touchPiece = this; touchPiece.style.position = 'fixed'; touchPiece.style.zIndex = '1000'; touchPiece.style.transform = 'scale(1.1)'; } }
+        function handleTouchMove(e) { if (touchPiece) { e.preventDefault(); const t = e.touches[0]; touchPiece.style.left = (t.clientX - touchPiece.offsetWidth/2) + 'px'; touchPiece.style.top = (t.clientY - touchPiece.offsetHeight/2) + 'px'; } }
+        function handleTouchEnd(e) {
+            if (!touchPiece) return;
+            const t = e.changedTouches[0];
+            touchPiece.style.display = 'none';
+            const target = document.elementFromPoint(t.clientX, t.clientY);
+            touchPiece.style.display = 'block';
+            const zone = target ? target.closest('.drop-zone') : null;
+            if (zone && touchPiece.id.split('-')[1] === zone.dataset.index) {
+                zone.appendChild(touchPiece);
+                touchPiece.classList.add('fixed', 'piece-snapped');
+                touchPiece.style.position = 'relative';
+                touchPiece.style.width = touchPiece.style.height = "100%";
+                touchPiece.style.left = touchPiece.style.top = '0';
+                checkWin();
+            } else {
+                touchPiece.style.position = 'relative';
+                document.getElementById('pieces-container').appendChild(touchPiece);
+            }
+            touchPiece.style.transform = 'none';
+            touchPiece = null;
+        }
+
+        function checkWin() {
+            if (document.querySelectorAll('.fixed').length === gridSize * gridSize) {
+                clearInterval(timerInterval);
+                setTimeout(() => {
+                    document.getElementById('main-game-area').style.display = "none";
+                    document.getElementById('reveal-card').style.display = "block";
+                    document.getElementById('full-img-view').src = levels[currentLevel].img;
+                    document.getElementById('info-title').innerText = levels[currentLevel].name;
+                    document.getElementById('info-desc').innerText = levels[currentLevel].desc;
+                    setTimeout(() => document.getElementById('inner-card').classList.add('flipped'), 100);
+                }, 600);
+            }
+        }
+
+        function nextLevel() {
+            currentLevel = (currentLevel + 1) % levels.length;
+            localStorage.setItem('chimalpa_puzzle_lvl', currentLevel);
+            initGame();
+        }
+
+        function resetProgress() {
+            if(confirm("¿Reiniciar progreso?")) {
+                localStorage.clear();
+                currentLevel = 0;
+                initGame();
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return;
+            const board = document.getElementById('puzzle-board');
+            const x = (window.innerWidth / 2 - e.pageX) / 20;
+            const y = (e.pageY - window.innerHeight / 2) / 20;
+            board.style.transform = `rotateX(${y}deg) rotateY(${x}deg) translateZ(50px)`;
+        });
+
+        initGame();
+    </script>
+</body>
+</html>
