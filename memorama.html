@@ -92,8 +92,19 @@
             }
         }
 
+        /* MODAL DE VICTORIA */
+        #victory-modal {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; 
+            backdrop-filter: blur(8px);
+        }
+        .v-content {
+            background:white; width:90%; max-width:350px; border-radius:25px; padding:40px 20px; 
+            text-align:center; box-shadow: 0 0 30px rgba(231,76,60,0.3); border: 2px solid #e74c3c;
+        }
+
         @media (max-width: 900px) { .memory-game { grid-template-columns: repeat(4, 1fr); } .card { height: 120px; } }
-        @media (max-width: 500px) { .memory-game { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 500px) { .memory-game { grid-template-columns: repeat(4, 1fr); gap: 5px; } .card { height: 85px; } .stat-box p { font-size: 1.2rem; } }
     </style>
 </head>
 <body>
@@ -121,6 +132,18 @@
 
         <div class="memory-game" id="board"></div>
         <button class="btn-reset" onclick="initGame()">REINICIAR DESAFÍO</button>
+    </div>
+
+    <div id="victory-modal">
+        <div class="v-content">
+            <div style="background:#e74c3c; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px;">
+                <i class="fas fa-trophy" style="color:white; font-size:2.5rem;"></i>
+            </div>
+            <h2 style="color:#333; font-weight:800; margin:0;">¡EXCELENTE TRABAJO!</h2>
+            <p style="color:#666; margin: 20px 0;">Has completado el entrenamiento experto satisfactoriamente.</p>
+            <button onclick="location.reload()" style="background:#e74c3c; color:white; border:none; padding:15px; border-radius:12px; font-weight:800; width:100%; cursor:pointer; margin-bottom:10px;">JUGAR DE NUEVO</button>
+            <a href="juegos.html" style="display:block; color:#666; text-decoration:none; font-weight:700; font-size:0.9rem; padding:10px;">VOLVER AL MENÚ</a>
+        </div>
     </div>
 
     <script>
@@ -152,6 +175,7 @@
             lockBoard = false;
             gameActive = false;
             updateStats();
+            document.getElementById('victory-modal').style.display = 'none';
             document.getElementById('game-msg').innerText = "DEMUESTRA TUS REFLEJOS: ¡CADA SEGUNDO CUENTA!";
             document.getElementById('game-msg').style.color = "#ccc";
             
@@ -229,7 +253,9 @@
                 if (matches === 16) {
                     clearInterval(timer);
                     gameActive = false;
-                    setTimeout(() => alert("¡Increíble Héctor! Maestro de la vialidad."), 500);
+                    setTimeout(() => {
+                        document.getElementById('victory-modal').style.display = 'flex';
+                    }, 500);
                 }
             } else {
                 timeLeft -= 5;
