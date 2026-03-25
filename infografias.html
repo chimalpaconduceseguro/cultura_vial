@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografías | Cultura Vial Chimalpa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS ODOO PARA INFOGRAFÍAS --- */
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- HEADER COMPACTO (IGUAL AL INDEX) --- */
+        header {
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 5px 5%; /* Padding reducido */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            border-bottom: 3px solid #008784;
+            transition: top 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .header-hidden { top: -150px; }
+
+        .menu-btn {
+            font-size: 26px;
+            color: #008784;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        #main-logo { 
+            height: 70px; /* Logo a 70px igual que el index */
+            width: auto; 
+        }
+
+        /* Títulos */
+        .page-title-section {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 90px; /* Ajustado para el nuevo header */
+        }
+
+        h1 { 
+            color: #212529; 
+            font-weight: 800;
+            text-transform: none; 
+            margin: 0; 
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Grid de Infografías */
+        .grid-container {
+            max-width: 1100px;
+            width: 90%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .card-info {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+        }
+
+        .card-info:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-color: #008784;
+        }
+
+        .card-info img { width: 100%; display: block; height: 400px; object-fit: cover; }
+
+        .card-text { padding: 25px; text-align: center; }
+
+        .card-text h3 { margin: 0; color: #333; font-weight: 700; font-size: 1.3rem; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 95%;
+            max-height: 90vh;
+            border-radius: 10px;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-regresar {
+            margin: 40px 0 80px 0;
+            padding: 15px 40px;
+            background-color: #008784;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 135, 132, 0.2);
+        }
+
+        .btn-regresar:hover { 
+            background: #006b69; 
+            transform: translateY(-3px);
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 60px;
+            background-color: #1a1a1a;
+            color: #888;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .card-info img { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="main-header">
+        <div class="menu-btn" onclick="openNav()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo-container">
+            <a href="index.html">
+                <img src="assets/logo.png" alt="Logo Chimalpa" id="main-logo">
+            </a>
+        </div>
+    </header>
+
+    <div id="mySideNav" class="side-menu" style="height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: #fff; overflow-x: hidden; transition: 0.5s; padding-top: 60px; box-shadow: 5px 0 15px rgba(0,0,0,0.1);">
+        <a href="javascript:void(0)" onclick="closeNav()" style="position: absolute; top: 10px; right: 25px; font-size: 36px; text-decoration: none; color: #ccc;">&times;</a>
+        <a href="index.html" style="padding: 15px 32px; text-decoration: none; font-size: 1.2rem; color: #333; display: block; font-weight: 600;">Inicio</a>
+        <a href="index.html#infografia" style="padding: 15px 32px; text-decoration: none; font-size: 1.2rem; color: #333; display: block; font-weight: 600;">Pirámide Vial</a>
+    </div>
+
+    <div class="page-title-section">
+        <h1>Material Educativo</h1>
+        <p class="subtitle">Toca cualquier imagen para verla en pantalla completa</p>
+    </div>
+
+    <main class="grid-container">
+        <article class="card-info" onclick="openModal('assets/1000418314.jpg')">
+            <img src="assets/1000418314.jpg" alt="Decálogo del Conductor">
+            <div class="card-text"><h3>Decálogo del Conductor</h3></div>
+        </article>
+
+        <article class="card-info" onclick="openModal('assets/1000418315.jpg')">
+            <img src="assets/1000418315.jpg" alt="Señales de Tránsito">
+            <div class="card-text"><h3>Señales de Tránsito</h3></div>
+        </article>
+    </main>
+
+    <div id="myModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="imgFull">
+    </div>
+
+    <a href="index.html" class="btn-regresar"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+
+    <footer>
+        <p>&copy; 2026 Chimalpa | Cultura Vial Chimalpa</p>
+        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.6;">San Francisco Chimalpa, Edo. Mex.</p>   
+    </footer>
+
+    <script>
+        function openNav() { document.getElementById("mySideNav").style.width = "280px"; }
+        function closeNav() { document.getElementById("mySideNav").style.width = "0"; }
+
+        function openModal(imgSrc) {
+            document.getElementById("myModal").style.display = "flex";
+            document.getElementById("imgFull").src = imgSrc;
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        let lastScrollTop = 0;
+        const header = document.getElementById("main-header");
+        window.addEventListener("scroll", function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                header.classList.add("header-hidden");
+            } else {
+                header.classList.remove("header-hidden");
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") closeModal();
+        });
+    </script>
+</body>
+</html>
