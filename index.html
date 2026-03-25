@@ -15,7 +15,79 @@
         .section-padding { padding: 80px 5%; }
         .container { max-width: 1100px; margin: 0 auto; }
 
-        /* --- ESTILO MODAL ZOOM HÍBRIDO --- */
+        /* --- NAVEGACIÓN DESPLEGABLE PREMIUM --- */
+        .side-menu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 3000; 
+            top: 0;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            overflow-x: hidden;
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            box-shadow: 15px 0 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-menu-header {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .side-menu a {
+            padding: 15px 35px;
+            text-decoration: none;
+            font-size: 1rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+            transition: 0.3s;
+            border-left: 6px solid transparent;
+        }
+
+        .side-menu a:hover {
+            background: rgba(0, 135, 132, 0.05);
+            color: #008784;
+            border-left: 6px solid #008784;
+            padding-left: 45px;
+        }
+
+        .close-btn-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .close-btn-container i {
+            font-size: 28px;
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-btn-container i:hover {
+            color: #e74c3c;
+        }
+
+        .menu-footer {
+            margin-top: auto;
+            padding: 30px;
+            text-align: center;
+            color: #bbb;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* --- RESTO DE TUS ESTILOS (IGUALES) --- */
         .zoom-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center;
@@ -35,7 +107,6 @@
         .clickable-media { cursor: zoom-in; transition: 0.3s; }
         .clickable-media:hover { opacity: 0.9; }
 
-        /* --- ESTILO SLIDER --- */
         .horizontal-slider {
             display: flex; overflow-x: auto; gap: 15px; scroll-snap-type: x mandatory;
             padding-bottom: 15px; scrollbar-width: thin; scrollbar-color: #008784 transparent;
@@ -46,7 +117,7 @@
         .slider-item { 
             flex: 0 0 100%; 
             scroll-snap-align: center; 
-            height: 400px; /* Altura controlada para evitar distorsión */
+            height: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -56,18 +127,16 @@
         .slider-item img, .slider-item video { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* Mantiene el cuadro uniforme */
+            object-fit: cover; 
             border-radius: 10px;
         }
 
-        /* --- CARRUSEL HERO --- */
         .carousel-container { position: relative; width: 100%; overflow: hidden; }
         .carousel-slide { display: none; width: 100%; }
         .center-piece-extra-large { display: block; margin: 0 auto; } 
         .fade { animation: fadeEffect 1.5s; }
         @keyframes fadeEffect { from { opacity: 0.4; } to { opacity: 1; } }
 
-        /* --- SECCIÓN 1: JERARQUÍA (PIRÁMIDE) --- */
         .movilidad-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
         .movilidad-item {
             display: flex; align-items: center; padding: 18px 25px; border-radius: 12px;
@@ -79,7 +148,6 @@
         .prio-4 { background: linear-gradient(90deg, #f39c12, #e67e22); width: 85%; margin-left: 7.5%; }
         .prio-5 { background: linear-gradient(90deg, #95a5a6, #7f8c8d); width: 80%; margin-left: 10%; }
 
-        /* --- ESTILOS PARA LAS SECCIONES INFORMATIVAS --- */
         .features-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px; max-width: 1100px; margin: 60px auto; padding: 0 20px;
@@ -111,7 +179,6 @@
             flex-wrap: wrap; background: #fff;
         }
 
-        /* --- SECCIÓN FLEX LAYOUT --- */
         .info-flex-row { display: flex; align-items: center; gap: 50px; flex-wrap: wrap; margin: 40px 0; }
         .flex-img-box { flex: 1; min-width: 300px; background: #fff; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .flex-text-box { flex: 1.2; min-width: 300px; text-align: left; }
@@ -119,7 +186,6 @@
         .bg-light { background-color: #f8f9fa; }
         .btn-juegos-final { background-color: #008784; color: white; padding: 20px 50px; border-radius: 50px; text-decoration: none; font-weight: 800; display: inline-block; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,135,132,0.3); }
 
-        /* --- ESTILO SECCIÓN PDF --- */
         .pdf-download-section { text-align: center; padding: 40px 5%; background: #fff; border-radius: 20px; margin: 20px auto; max-width: 1100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .pdf-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 20px; }
         .btn-pdf { background-color: #e74c3c; color: white; padding: 15px 30px; border-radius: 12px; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 10px; transition: 0.3s; border: none; cursor: pointer; }
@@ -151,13 +217,24 @@
         <div class="logo-container"><img src="assets/logo.png" alt="Logo Chimalpa" id="main-logo"></div>
     </header>
 
-    <div id="mySideNav" class="side-menu" style="height: 100%; width: 0; position: fixed; z-index: 2000; top: 0; left: 0; background-color: #111; overflow-x: hidden; transition: 0.5s; padding-top: 60px;">
-        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()" style="position: absolute; top: 10px; right: 25px; font-size: 36px; color:white; text-decoration:none;">&times;</a>
-        <a href="#hero" onclick="closeNav()" style="padding: 8px 32px; text-decoration: none; font-size: 20px; color: #818181; display: block;">Inicio</a>
-        <a href="#infografia" onclick="closeNav()" style="padding: 8px 32px; text-decoration: none; font-size: 20px; color: #818181; display: block;">Pirámide Vial</a>
-        <a href="#prototipo" onclick="closeNav()" style="padding: 8px 32px; text-decoration: none; font-size: 20px; color: #818181; display: block;">Prototipo</a>
-        <a href="#clases" onclick="closeNav()" style="padding: 8px 32px; text-decoration: none; font-size: 20px; color: #818181; display: block;">Capacitaciones</a>
-        <a href="juegos.html" onclick="closeNav()" style="padding: 8px 32px; text-decoration: none; font-size: 20px; color: white; display: block;"><i class="fas fa-gamepad"></i> Juegos</a>
+    <div id="mySideNav" class="side-menu">
+        <div class="close-btn-container">
+            <i class="fas fa-times" onclick="closeNav()"></i>
+        </div>
+        
+        <div class="side-menu-header">
+            <img src="assets/logo.png" style="width: 120px; height: auto;">
+        </div>
+
+        <a href="#hero" onclick="closeNav()"><i class="fas fa-home"></i> Inicio</a>
+        <a href="#infografia" onclick="closeNav()"><i class="fas fa-layer-group"></i> Pirámide Vial</a>
+        <a href="#prototipo" onclick="closeNav()"><i class="fas fa-microchip"></i> Prototipo</a>
+        <a href="#clases" onclick="closeNav()"><i class="fas fa-chalkboard-teacher"></i> Capacitaciones</a>
+        <a href="juegos.html"><i class="fas fa-gamepad" style="color: #008784;"></i> Zona de Juegos</a>
+        
+        <div class="menu-footer">
+            SAN FRANCISCO CHIMALPA <br> 2026
+        </div>
     </div>
 
     <main>
@@ -166,7 +243,7 @@
         <section id="hero" class="hero">
             <div class="hero-text" style="text-align: center; padding: 40px 20px;">
                 <h1 style="font-weight: 800; font-size: 2.5rem;">Educación y Seguridad Vial</h1>
-                <p style="color: #ffffff;">Chimalpa Conduce Seguro: Transformando nuestra comunidad con responsabilidad y cultura vial.</p>
+                <p style="color: #ffffff;">Transformando nuestra comunidad con responsabilidad y cultura vial.</p>
             </div>
             <div class="main-image-wrapper">
                 <div class="carousel-container" id="swipe-container">
@@ -190,49 +267,26 @@
 
         <section class="pdf-download-section">
             <h2 style="font-weight: 800;">Documentación y Recursos</h2>
-            <p style="color: #666;">Descarga materiales educativos y guías en formato PDF.</p>
             <div class="pdf-grid">
                 <a href="assets/archivo1.pdf" class="btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> LEY GENERAL DE MOVILIDAD </a>
                 <a href="assets/archivo2.pdf" class="btn-pdf" target="_blank"><i class="fas fa-file-pdf"></i> GUIA VIAL</a>
             </div>
         </section>
 
-        <section class="section-padding" style="background: linear-gradient(135deg, #008784 0%, #005f5d 100%); color: white; margin: 40px 0; border-radius: 50px; position: relative; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
+        <section id="juegos" class="section-padding" style="background: linear-gradient(135deg, #008784 0%, #005f5d 100%); color: white; margin: 40px 0; border-radius: 50px; position: relative; overflow: hidden; max-width: 1100px; margin-left: auto; margin-right: auto;">
             <i class="fas fa-gamepad" style="position: absolute; right: -20px; bottom: -20px; font-size: 15rem; opacity: 0.1; transform: rotate(-15deg);"></i>
             <div class="container" style="position: relative; z-index: 2; text-align: center;">
                 <span style="text-transform: uppercase; letter-spacing: 3px; font-weight: 800; font-size: 0.9rem; opacity: 0.9;">¿Crees que lo sabes todo?</span>
                 <h2 style="font-weight: 800; font-size: 2.8rem; margin: 15px 0;">¡Demuéstralo en la Pista!</h2>
-                <p style="max-width: 600px; margin: 0 auto 30px; font-size: 1.1rem; line-height: 1.6; opacity: 0.9;">
-                    La verdadera maestría vial combina el <strong>conocimiento teórico</strong> con la <strong>capacidad de respuesta</strong>. Hemos diseñado un ecosistema de aprendizaje que incluye trivias y simulaciones en tiempo real para validar tu criterio técnico en las calles.
-                </p>
                 <a href="juegos.html" class="btn-juegos-final" style="background: white; color: #008784; border: none; padding: 15px 40px;">
                     <i class="fas fa-play-circle"></i> ¡EMPEZAR EL DESAFÍO!
                 </a>
             </div>
         </section>
 
-        <section id="mision" class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-bullseye"></i>
-                <h3>Nuestra Misión</h3>
-                <p>Reducir los incidentes viales en Chimalpa mediante educación interactiva y concientización.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-eye"></i>
-                <h3>Nuestra Visión</h3>
-                <p>Ser una comunidad modelo en el Estado de México basada en el respeto a la movilidad urbana.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-hands-helping"></i>
-                <h3>Compromiso</h3>
-                <p>Trabajamos de la mano con los habitantes para promover soluciones de seguridad vial.</p>
-            </div>
-        </section>
-
         <section id="prototipo" class="section-padding container">
             <div class="info-flex-row">
                 <div class="flex-img-box">
-                    <p style="text-align:center; font-size: 0.7rem; color:#888; margin-bottom:5px;"><i class="fas fa-arrows-alt-h"></i> Desliza para ver más</p>
                     <div class="horizontal-slider" id="gallery-prototipo">
                         <div class="slider-item"><img src="assets/prototipo.jpg" class="clickable-media" onclick="openGallery(0, 'gallery-prototipo')"></div>
                         <div class="slider-item"><img src="assets/prototipo1.jpg" class="clickable-media" onclick="openGallery(1, 'gallery-prototipo')"></div>
@@ -241,34 +295,8 @@
                 <div class="flex-text-box">
                     <span class="badge-prototipo">Plus</span>
                     <h2 style="font-weight: 800; margin-top: 15px; color: #333;">SAFEVISION</h2>
-                    <p style="color: #666; line-height: 1.6;">Es un Sistema Avanzado de Asistencia al Conductor (ADAS) diseñado para democratizar la seguridad vial. No creemos que la tecnología de punta deba ser un lujo; por ello, hemos desarrollado una solución de visión artificial capaz de integrarse en cualquier vehículo actual..</p>
-                    <p style="font-weight: 700; color: #008784;">Visión avanzada para el conductor del presente.</p>
+                    <p style="color: #666; line-height: 1.6;">Sistema Avanzado de Asistencia al Conductor (ADAS) diseñado para democratizar la seguridad vial integrándose en cualquier vehículo.</p>
                 </div>
-            </div>
-        </section>
-
-        <section class="decalogo-section">
-            <h2 style="font-weight: 800;">Reglas de Oro en Chimalpa</h2>
-            <div class="decalogo-list">
-                <div class="decalogo-item"><i class="fas fa-check-circle"></i> Usa siempre el cinturón.</div>
-                <div class="decalogo-item"><i class="fas fa-check-circle"></i> Respeta zonas escolares.</div>
-                <div class="decalogo-item"><i class="fas fa-check-circle"></i> Cede el paso al peatón.</div>
-                <div class="decalogo-item"><i class="fas fa-check-circle"></i> No uses el celular al conducir.</div>
-            </div>
-        </section>
-
-        <section class="stats-section">
-            <div style="text-align: center;">
-                <h2 style="color: #008784; font-size: 3rem; margin: 0; font-weight: 800;">90%</h2>
-                <p style="color: #666; font-weight: 700;">Accidentes prevenibles</p>
-            </div>
-            <div style="text-align: center;">
-                <h2 style="color: #008784; font-size: 3rem; margin: 0; font-weight: 800;">1.5m</h2>
-                <p style="color: #666; font-weight: 700;">Distancia al ciclista</p>
-            </div>
-            <div style="text-align: center;">
-                <h2 style="color: #008784; font-size: 3rem; margin: 0; font-weight: 800;">0</h2>
-                <p style="color: #666; font-weight: 700;">Distracciones permitidas</p>
             </div>
         </section>
 
@@ -276,13 +304,10 @@
             <div class="container">
                 <div class="info-flex-row">
                     <div class="flex-text-box">
-                        <span style="background: #008784; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">Capacitación</span>
-                        <h2 style="font-weight: 800; margin-top: 15px; color: #333;">Evidencia de Capacitación</h2>
-                        <p style="color: #666; line-height: 1.6;">Impacto real en la comunidad de San Francisco Chimalpa a través de talleres comunitarios y educación en escuelas.</p>
-                        <p style="font-weight: 700; color: #008784;">Concientización para un cambio real.</p>
+                        <h2 style="font-weight: 800; color: #333;">Evidencia de Capacitación</h2>
+                        <p style="color: #666; line-height: 1.6;">Impacto real en San Francisco Chimalpa a través de talleres comunitarios y educación escolar.</p>
                     </div>
                     <div class="flex-img-box">
-                        <p style="text-align:center; font-size: 0.7rem; color:#888; margin-bottom:5px;"><i class="fas fa-arrows-alt-h"></i> Desliza para ver evidencias</p>
                         <div class="horizontal-slider" id="gallery-clases">
                             <div class="slider-item"><img src="assets/clase1.jpg" class="clickable-media" onclick="openGallery(0, 'gallery-clases')"></div>
                             <div class="slider-item"><img src="assets/clase2.jpg" class="clickable-media" onclick="openGallery(1, 'gallery-clases')"></div>
@@ -295,10 +320,13 @@
 
     <footer style="text-align: center; padding: 40px 20px; background: #f1f1f1;">
         <p>&copy; 2026 Chimalpa | Cultura Vial Chimalpa</p>
-        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.6;">San Francisco Chimalpa, Edo. Mex.</p>
     </footer>
 
     <script>
+        function openNav() { document.getElementById("mySideNav").style.width = "300px"; }
+        function closeNav() { document.getElementById("mySideNav").style.width = "0"; }
+
+        // (Se mantienen tus funciones de zoom y slider existentes)
         let currentMediaIndex = 0;
         let activeGalleryMedia = [];
 
@@ -332,8 +360,6 @@
         function prevMedia() { currentMediaIndex = (currentMediaIndex - 1 + activeGalleryMedia.length) % activeGalleryMedia.length; updateModalMedia(); }
         function closeZoom() { document.getElementById('zoomModal').style.display = 'none'; document.getElementById('vidZoomed').pause(); document.body.style.overflow = 'auto'; }
         document.getElementById('zoomModal').addEventListener('click', function(e) { if(e.target === this) closeZoom(); });
-        function openNav() { document.getElementById("mySideNav").style.width = "280px"; }
-        function closeNav() { document.getElementById("mySideNav").style.width = "0"; }
 
         let slideIndex = 0;
         showSlides();
