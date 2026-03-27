@@ -15,7 +15,6 @@
             perspective: 1200px; overflow: hidden; font-family: 'Inter', sans-serif;
         }
 
-        /* --- BOTÓN DE SALIDA --- */
         .exit-btn {
             position: fixed; top: 20px; left: 20px; z-index: 1001;
             padding: 10px 20px; background: rgba(255, 255, 255, 0.05);
@@ -27,7 +26,6 @@
         }
         .exit-btn:hover { background: var(--wrong); border-color: var(--wrong); transform: scale(1.05); }
 
-        /* --- CONTENEDOR DE VIDRIO ROTO --- */
         #shatter-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1000; display: none;
@@ -35,7 +33,6 @@
             background-size: cover; opacity: 0.8;
         }
 
-        /* --- ANIMACIÓN DE CHOQUE --- */
         @keyframes crashShake {
             0% { transform: scale(1) translateZ(0); }
             20% { transform: scale(1.2) rotate(3deg) translateZ(100px); filter: brightness(4) blur(2px); }
@@ -48,6 +45,7 @@
             border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 500px;
             padding: 40px; border-radius: 40px; text-align: center;
             transform-style: preserve-3d; transition: transform 0.1s;
+            position: relative;
         }
 
         .timer-node {
@@ -63,7 +61,7 @@
             border-radius: 25px; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: translateZ(30px);
         }
-        .img-box img { max-width: 80%; }
+        .img-box img { max-width: 80%; max-height: 80%; object-fit: contain; }
 
         .options-grid { display: grid; gap: 12px; }
         .btn-opt {
@@ -77,7 +75,7 @@
 
         #defeat-screen { 
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(20, 0, 0, 0.9); z-index: 50; border-radius: 40px;
+            background: rgba(20, 0, 0, 0.95); z-index: 50; border-radius: 40px;
             flex-direction: column; align-items: center; justify-content: center;
         }
         .defeat-text { font-family: 'Orbitron'; color: var(--wrong); font-size: 2rem; font-weight: 900; letter-spacing: 2px; }
@@ -99,101 +97,142 @@
             <p style="color: var(--primary); font-size: 0.8rem;">Reiniciando sistemas...</p>
         </div>
 
-        <div class="timer-node" id="timer-val">5</div>
+        <div class="timer-node" id="timer-val">10</div>
         
         <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--primary); margin-bottom:15px; letter-spacing:3px;">SIMULACIÓN DE IMPACTO v3.0</div>
         
         <div class="img-box"><img src="" id="q-img"></div>
-        <h2 id="q-text" style="color: #fff; font-size: 1.2rem; margin-bottom: 30px; min-height: 50px;"></h2>
+        <h2 id="q-text" style="color: #fff; font-size: 1.1rem; margin-bottom: 30px; min-height: 50px;"></h2>
         
         <div class="options-grid" id="options-box"></div>
     </div>
 
     <div class="quiz-card" id="final-screen">
-        <h1 style="font-family:'Orbitron'; color:var(--primary)">MISIÓN COMPLETADA</h1>
-        <div style="font-size: 4rem; font-weight: 900;" id="final-score">0/10</div>
-        <button onclick="location.reload()" style="padding:15px 40px; border-radius:50px; border:none; background:var(--primary); font-family:'Orbitron'; font-weight:900; cursor:pointer;">REINICIAR</button>
+        <i class="fas fa-trophy" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 20px;"></i>
+        <h1 style="font-family:'Orbitron'; color:var(--primary); font-size: 1.6rem; letter-spacing: 2px;">CERTIFICACIÓN ÉPICA</h1>
+        
+        <div id="final-message" style="color: #fff; line-height: 1.6; margin: 20px 0; font-size: 1.1rem; font-weight: 800;">
+            ¡HAS SUPERADO LA PRUEBA SIN ERRORES!
+        </div>
+
+        <p style="color: #ccc; margin-bottom: 30px; font-size: 0.9rem;">
+            Tienes reflejos de acero y un dominio total del reglamento. San Francisco Chimalpa es más seguro gracias a conductores como tú.
+        </p>
+
+        <button onclick="location.reload()" style="padding:15px 40px; border-radius:50px; border:none; background:var(--primary); font-family:'Orbitron'; font-weight:900; cursor:pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;">
+            VOLVER A EMPEZAR
+        </button>
     </div>
 
     <script>
-        const banco = [
-            { img: "assets/sr-alto.png", q: "¿Cuál es la acción obligatoria ante esta señal?", opts: ["Disminuir velocidad", "Alto total 3 segundos", "Ceda el paso", "Girar a la derecha"], ans: 1 },
-            { img: "assets/sp-peaton.png", q: "¿Qué prioridad tiene el actor de esta señal?", opts: ["Baja", "Media", "Máxima (Nivel 1)", "Nula"], ans: 2 },
-            { img: "assets/sr-no-u.png", q: "Esta señal prohíbe estrictamente:", opts: ["Girar a la izquierda", "Seguir de frente", "Retorno en U", "Cambio de carril"], ans: 2 },
-            { img: "assets/si-ciclovia.png", q: "El color azul en esta señal indica que es:", opts: ["Restrictiva", "Preventiva", "Informativa", "Transitoria"], ans: 2 }
-            // Agrega tus otras señales aquí
+        const bancoTotal = [
+            { img: "assets/sp-peaton.png", q: "¿Cuál es la prioridad ante esta señal?", opts: ["Baja", "Nula", "Máxima", "Media"], ans: 2 },
+            { img: "assets/sp-escolar.png", q: "En esta zona, la velocidad máxima es de:", opts: ["40 km/h", "20 km/h", "30 km/h", "60 km/h"], ans: 1 },
+            { img: "assets/sp-hospital.png", q: "¿Qué restricción adicional suele aplicar aquí?", opts: ["No usar claxon", "Prohibido luces", "Solo ambulancias", "No estacionar"], ans: 0 },
+            { img: "assets/sr-no-peaton.png", q: "Esta señal prohíbe el paso a peatones por:", opts: ["Zonas escolares", "Parques", "Vías rápidas", "Hospitales"], ans: 2 },
+            { img: "assets/sr-velocidad.png", q: "Esta señal establece un límite:", opts: ["Mínimo", "Técnico sugerido", "De carga", "Máximo permitido"], ans: 3 },
+            { img: "assets/si-puente.png", q: "Indica la presencia de un:", opts: ["Paso a desnivel seguro", "Túnel", "Paradero", "Tope"], ans: 0 },
+            { img: "assets/si-zona-peatonal.png", q: "Esta área es de circulación:", opts: ["Compartida", "Solo motos", "Exclusiva personas", "Solo emergencias"], ans: 2 },
+            { img: "assets/sp-cruce-ciclistas.png", q: "Advierte sobre el flujo constante de:", opts: ["Bicicletas", "Motos", "Peatones", "Carga"], ans: 0 },
+            { img: "assets/sr-solo-bicis.png", q: "Indica un carril:", opts: ["Preferente", "Confinado ciclista", "De alta velocidad", "Solo domingos"], ans: 1 },
+            { img: "assets/sr-no-bicis.png", q: "Prohíbe el acceso a ciclistas en:", opts: ["Ciclovías", "Vías de alto riesgo", "Zonas rurales", "Calles locales"], ans: 1 },
+            { img: "assets/si-ciclovia.png", q: "Esta señal informa sobre una:", opts: ["Ruta ciclista", "Calle cerrada", "Zona de baches", "Pista de carreras"], ans: 0 },
+            { img: "assets/pav-caja-bici.png", q: "La Caja Bici sirve para:", opts: ["Guardar bicis", "Reparaciones", "Espera prioritaria", "Carga de objetos"], ans: 2 },
+            { img: "assets/pav-compartido.png", q: "En carril compartido, el ciclista tiene prioridad:", opts: ["Sobre el carril completo", "Solo a la derecha", "Solo en banquetas", "No tiene prioridad"], ans: 0 },
+            { img: "assets/sp-bus.png", q: "Advierte sobre la incorporación de:", opts: ["Taxis", "Motos", "Ambulancias", "Transporte masivo"], ans: 3 },
+            { img: "assets/sp-tranvia.png", q: "Indica cruce con transporte:", opts: ["Eléctrico (Tren/Trole)", "Aéreo", "De carga pesada", "Escolar"], ans: 0 },
+            { img: "assets/sr-solo-bus.png", q: "Carril de uso exclusivo para:", opts: ["Autos Plus", "Transporte colectivo", "Cualquier vehículo", "Solo emergencias"], ans: 1 },
+            { img: "assets/sr-prohibido-parar.png", q: "En esta vía de flujo continuo:", opts: ["Prohibido ascenso/descenso", "Se puede parquear", "Solo carga", "Límite 10 min"], ans: 0 },
+            { img: "assets/sr-prohibido-bus.png", q: "Restricción para vehículos de:", opts: ["Lujo", "Servicio público", "Transporte pesado", "Dos ejes"], ans: 2 },
+            { img: "assets/si-parada.png", q: "Punto oficial para:", opts: ["Pasajeros (Bus)", "Carga de gas", "Arreglar llantas", "Pernoctar"], ans: 0 },
+            { img: "assets/si-taxi.png", q: "Zona reservada para:", opts: ["Autos particulares", "Bicicletas", "Transporte individual", "Carga masiva"], ans: 2 },
+            { img: "assets/si-terminal.png", q: "Indica una estación de:", opts: ["Policía", "Bomberos", "Transferencia/Fin ruta", "Peaje"], ans: 2 },
+            { img: "assets/pav-solo-bus.png", q: "Señalamiento horizontal de carril:", opts: ["Preferente Bus", "De emergencia", "De rebase", "Para baches"], ans: 0 },
+            { img: "assets/sp-altura.png", q: "Establece el límite:", opts: ["Vertical (Unidades)", "Horizontal", "De peso", "De velocidad"], ans: 0 },
+            { img: "assets/sp-anchura.png", q: "Límite horizontal en pasos:", opts: ["Anchos", "Inundados", "Estrechos", "Elevados"], ans: 2 },
+            { img: "assets/sr-peso-maximo.png", q: "Esta señal indica el límite de:", opts: ["Pasajeros", "Velocidad", "Tonelaje permitido", "Altura"], ans: 2 },
+            { img: "assets/sr-no-carga.png", q: "Prohibido el tránsito de:", opts: ["Motos", "Autos nuevos", "Carga pesada", "Bicicletas"], ans: 2 },
+            { img: "assets/sr-longitud.png", q: "Restricción basada en:", opts: ["Radio de giro", "Peso bruto", "Altura de cabina", "Ancho de caja"], ans: 0 },
+            { img: "assets/si-zona-carga.png", q: "Área logística diseñada para:", opts: ["Estacionarse", "Picnic", "Maniobras de carga", "Reparación motor"], ans: 2 },
+            { img: "assets/sp-curva-cerrada.png", q: "Requiere reducción de velocidad por:", opts: ["Diseño de la vía", "Baches", "Animales", "Neblina"], ans: 0 },
+            { img: "assets/sp-tope.png", q: "Obstáculo físico para:", opts: ["Adornar la calle", "Bloquear el paso", "Control de velocidad", "Drenaje"], ans: 2 },
+            { img: "assets/sp-semaforo.png", q: "Advertencia de control:", opts: ["Manual", "Militar", "Satelital", "Electrónico (Próximo)"], ans: 3 },
+            { img: "assets/sp-piso-resbaloso.png", q: "Indica baja:", opts: ["Adherencia", "Visibilidad", "Iluminación", "Velocidad"], ans: 0 },
+            { img: "assets/sr-alto.png", q: "La detención del vehículo debe ser:", opts: ["Parcial", "Sugerida", "Solo si hay tráfico", "Total y obligatoria"], ans: 3 },
+            { img: "assets/sr-ceda-el-paso.png", q: "Da prioridad a:", opts: ["La vía principal", "Vehículos lentos", "Peatones atrás", "Motos"], ans: 0 },
+            { img: "assets/sr-no-estacionarse.png", q: "Sirve para mantener la vía:", opts: ["Limpia", "Cerrada", "Libre de obstáculos", "Iluminada"], ans: 2 },
+            { img: "assets/sr-no-u.png", q: "Maniobra prohibida por:", opts: ["Estética", "Ahorro gasolina", "Seguridad", "Multa mínima"], ans: 2 },
+            { img: "assets/si-estacionamiento.png", q: "Espacio autorizado para:", opts: ["Reparar", "Vender comida", "Correr", "Resguardo de unidad"], ans: 3 },
+            { img: "assets/si-transicion.png", q: "Informa sobre cambios en:", opts: ["El clima", "La configuración de vía", "El reglamento", "El costo caseta"], ans: 1 }
         ];
 
-        let exam = [], current = 0, score = 0, timeLeft = 5, timerInterval;
+        let preguntasPartida = [], current = 0, timeLeft = 10, timerInterval;
 
-        function start() {
-            exam = banco.sort(() => 0.5 - Math.random()).slice(0, 10);
-            render();
+        function iniciarJuego() {
+            // Mezclamos el banco y seleccionamos 10 diferentes cada vez
+            preguntasPartida = bancoTotal.sort(() => 0.5 - Math.random()).slice(0, 10);
+            mostrarPregunta();
         }
 
-        function render() {
-            const data = exam[current];
-            document.getElementById('q-img').src = data.img;
-            document.getElementById('q-text').innerText = data.q;
-            const box = document.getElementById('options-box');
-            box.innerHTML = "";
-            data.opts.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = "btn-opt";
-                btn.innerHTML = `<span>${String.fromCharCode(65 + i)}</span> ${opt}`;
-                btn.onclick = () => check(i);
-                box.appendChild(btn);
+        function mostrarPregunta() {
+            const datos = preguntasPartida[current];
+            document.getElementById('q-img').src = datos.img;
+            document.getElementById('q-text').innerText = datos.q;
+            const contenedor = document.getElementById('options-box');
+            contenedor.innerHTML = "";
+            datos.opts.forEach((opcion, index) => {
+                const boton = document.createElement('button');
+                boton.className = "btn-opt";
+                boton.innerHTML = `<span>${String.fromCharCode(65 + index)}</span> ${opcion}`;
+                boton.onclick = () => verificar(index);
+                contenedor.appendChild(boton);
             });
-            resetTimer();
+            iniciarContador();
         }
 
-        function resetTimer() {
-            timeLeft = 5;
+        function iniciarContador() {
+            timeLeft = 10;
             document.getElementById('timer-val').innerText = timeLeft;
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer-val').innerText = timeLeft;
-                if(timeLeft <= 0) triggerDefeat();
+                if(timeLeft <= 0) perder();
             }, 1000);
         }
 
-        function check(i) {
+        function verificar(indice) {
             clearInterval(timerInterval);
-            if(i === exam[current].ans) {
-                score++;
+            if(indice === preguntasPartida[current].ans) {
                 current++;
-                if(current < 10) render(); else finish();
+                if(current < 10) mostrarPregunta(); else terminar();
             } else {
-                triggerDefeat();
+                perder();
             }
         }
 
-        function triggerDefeat() {
+        function perder() {
             clearInterval(timerInterval);
-            const card = document.getElementById('main-card');
-            const glass = document.getElementById('shatter-overlay');
-            const defeat = document.getElementById('defeat-screen');
-            card.classList.add('screen-crash');
-            glass.style.display = 'block';
-            defeat.style.display = 'flex';
+            document.getElementById('main-card').classList.add('screen-crash');
+            document.getElementById('shatter-overlay').style.display = 'block';
+            document.getElementById('defeat-screen').style.display = 'flex';
+            // Recarga total: Pregunta 1 y baraja de nuevo
             setTimeout(() => { location.reload(); }, 4000);
         }
 
-        function finish() {
+        function terminar() {
             document.getElementById('main-card').style.display = "none";
             document.getElementById('final-screen').style.display = "block";
-            document.getElementById('final-score').innerText = `${score}/10`;
         }
 
         document.addEventListener('mousemove', (e) => {
             const card = document.getElementById('main-card');
-            const x = (window.innerWidth / 2 - e.pageX) / 25;
-            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            const x = (window.innerWidth / 2 - e.pageX) / 30;
+            const y = (window.innerHeight / 2 - e.pageY) / 30;
             card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
         });
 
-        start();
+        iniciarJuego();
     </script>
 </body>
 </html>
